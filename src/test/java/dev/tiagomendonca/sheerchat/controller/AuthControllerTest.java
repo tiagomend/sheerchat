@@ -3,6 +3,9 @@ package dev.tiagomendonca.sheerchat.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.tiagomendonca.sheerchat.dto.RegisterRequest;
 import dev.tiagomendonca.sheerchat.dto.RegisterResponse;
+import dev.tiagomendonca.sheerchat.exception.DatabaseCommunicationException;
+import dev.tiagomendonca.sheerchat.exception.EmailAlreadyExistsException;
+import dev.tiagomendonca.sheerchat.exception.UsernameAlreadyExistsException;
 import dev.tiagomendonca.sheerchat.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +61,7 @@ class AuthControllerTest {
         RegisterRequest request = new RegisterRequest("existinguser", "test@example.com", "password123");
 
         when(userService.registerUser(any(RegisterRequest.class)))
-                .thenThrow(new IllegalArgumentException("Username already exists"));
+                .thenThrow(new UsernameAlreadyExistsException("Username already exists"));
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -73,7 +76,7 @@ class AuthControllerTest {
         RegisterRequest request = new RegisterRequest("newuser", "existing@example.com", "password123");
 
         when(userService.registerUser(any(RegisterRequest.class)))
-                .thenThrow(new IllegalArgumentException("Email already exists"));
+                .thenThrow(new EmailAlreadyExistsException("Email already exists"));
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -81,5 +84,20 @@ class AuthControllerTest {
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Email already exists"));
+    }
+
+    @Test
+    void testRegisterUser_DatabaseCommunicationError() throws Exception {
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "password123");
+
+        when(userService.registerUser(any(RegisterRequest.class)))
+                .thenThrow(new DatabaseCommunicationException("Erro ao comunicar com o banco de dados. Tente novamente mais tarde.", new RuntimeException()));
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("Erro ao comunicar com o banco de dados. Tente novamente mais tarde."));
     }
 }

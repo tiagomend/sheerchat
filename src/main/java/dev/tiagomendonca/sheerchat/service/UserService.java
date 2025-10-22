@@ -2,6 +2,9 @@ package dev.tiagomendonca.sheerchat.service;
 
 import dev.tiagomendonca.sheerchat.dto.RegisterRequest;
 import dev.tiagomendonca.sheerchat.dto.RegisterResponse;
+import dev.tiagomendonca.sheerchat.exception.DatabaseCommunicationException;
+import dev.tiagomendonca.sheerchat.exception.EmailAlreadyExistsException;
+import dev.tiagomendonca.sheerchat.exception.UsernameAlreadyExistsException;
 import dev.tiagomendonca.sheerchat.model.User;
 import dev.tiagomendonca.sheerchat.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,33 +26,39 @@ public class UserService {
     }
 
     public RegisterResponse registerUser(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+        try {
+            if (userRepository.existsByUsername(request.getUsername())) {
+                throw new UsernameAlreadyExistsException("Username already exists");
+            }
+
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new EmailAlreadyExistsException("Email already exists");
+            }
+
+            User user = new User();
+            user.setUsername(request.getUsername());
+            user.setEmail(request.getEmail());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setEmailConfirmed(!emailConfirmationEnabled);
+
+            User savedUser = userRepository.save(user);
+
+            boolean emailSent = false;
+            if (emailConfirmationEnabled) {
+                emailSent = sendConfirmationEmail(savedUser);
+            }
+
+            return new RegisterResponse(
+                "Conta criada com sucesso",
+                savedUser.getId(),
+                savedUser.getUsername(),
+                emailSent
+            );
+        } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DatabaseCommunicationException("Erro ao comunicar com o banco de dados. Tente novamente mais tarde.", e);
         }
-
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
-        }
-
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmailConfirmed(!emailConfirmationEnabled);
-
-        User savedUser = userRepository.save(user);
-
-        boolean emailSent = false;
-        if (emailConfirmationEnabled) {
-            emailSent = sendConfirmationEmail(savedUser);
-        }
-
-        return new RegisterResponse(
-            "Conta criada com sucesso",
-            savedUser.getId(),
-            savedUser.getUsername(),
-            emailSent
-        );
     }
 
     private boolean sendConfirmationEmail(User user) {
