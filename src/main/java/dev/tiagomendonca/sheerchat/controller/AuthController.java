@@ -2,6 +2,9 @@ package dev.tiagomendonca.sheerchat.controller;
 
 import dev.tiagomendonca.sheerchat.dto.RegisterRequest;
 import dev.tiagomendonca.sheerchat.dto.RegisterResponse;
+import dev.tiagomendonca.sheerchat.exception.DatabaseCommunicationException;
+import dev.tiagomendonca.sheerchat.exception.EmailAlreadyExistsException;
+import dev.tiagomendonca.sheerchat.exception.UsernameAlreadyExistsException;
 import dev.tiagomendonca.sheerchat.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,10 +26,10 @@ public class AuthController {
         try {
             RegisterResponse response = userService.registerUser(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException e) {
+        } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException e) {
             RegisterResponse errorResponse = new RegisterResponse(e.getMessage(), null, null, false);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        } catch (RuntimeException e) {
+        } catch (DatabaseCommunicationException e) {
             RegisterResponse errorResponse = new RegisterResponse(e.getMessage(), null, null, false);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }

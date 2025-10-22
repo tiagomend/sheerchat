@@ -2,6 +2,9 @@ package dev.tiagomendonca.sheerchat.service;
 
 import dev.tiagomendonca.sheerchat.dto.RegisterRequest;
 import dev.tiagomendonca.sheerchat.dto.RegisterResponse;
+import dev.tiagomendonca.sheerchat.exception.DatabaseCommunicationException;
+import dev.tiagomendonca.sheerchat.exception.EmailAlreadyExistsException;
+import dev.tiagomendonca.sheerchat.exception.UsernameAlreadyExistsException;
 import dev.tiagomendonca.sheerchat.model.User;
 import dev.tiagomendonca.sheerchat.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +69,7 @@ class UserServiceTest {
 
         when(userRepository.existsByUsername("existinguser")).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        UsernameAlreadyExistsException exception = assertThrows(UsernameAlreadyExistsException.class, () -> {
             userService.registerUser(request);
         });
 
@@ -82,7 +85,7 @@ class UserServiceTest {
         when(userRepository.existsByUsername("newuser")).thenReturn(false);
         when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        EmailAlreadyExistsException exception = assertThrows(EmailAlreadyExistsException.class, () -> {
             userService.registerUser(request);
         });
 
@@ -121,7 +124,7 @@ class UserServiceTest {
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("Database connection failed"));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        DatabaseCommunicationException exception = assertThrows(DatabaseCommunicationException.class, () -> {
             userService.registerUser(request);
         });
 

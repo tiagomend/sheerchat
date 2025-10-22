@@ -2,6 +2,9 @@ package dev.tiagomendonca.sheerchat.service;
 
 import dev.tiagomendonca.sheerchat.dto.RegisterRequest;
 import dev.tiagomendonca.sheerchat.dto.RegisterResponse;
+import dev.tiagomendonca.sheerchat.exception.DatabaseCommunicationException;
+import dev.tiagomendonca.sheerchat.exception.EmailAlreadyExistsException;
+import dev.tiagomendonca.sheerchat.exception.UsernameAlreadyExistsException;
 import dev.tiagomendonca.sheerchat.model.User;
 import dev.tiagomendonca.sheerchat.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,11 +28,11 @@ public class UserService {
     public RegisterResponse registerUser(RegisterRequest request) {
         try {
             if (userRepository.existsByUsername(request.getUsername())) {
-                throw new IllegalArgumentException("Username already exists");
+                throw new UsernameAlreadyExistsException("Username already exists");
             }
 
             if (userRepository.existsByEmail(request.getEmail())) {
-                throw new IllegalArgumentException("Email already exists");
+                throw new EmailAlreadyExistsException("Email already exists");
             }
 
             User user = new User();
@@ -51,10 +54,10 @@ public class UserService {
                 savedUser.getUsername(),
                 emailSent
             );
-        } catch (IllegalArgumentException e) {
+        } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao comunicar com o banco de dados. Tente novamente mais tarde.", e);
+            throw new DatabaseCommunicationException("Erro ao comunicar com o banco de dados. Tente novamente mais tarde.", e);
         }
     }
 
