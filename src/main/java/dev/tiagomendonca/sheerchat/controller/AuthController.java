@@ -26,6 +26,9 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             RegisterResponse errorResponse = new RegisterResponse(e.getMessage(), null, null, false);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (RuntimeException e) {
+            RegisterResponse errorResponse = new RegisterResponse(e.getMessage(), null, null, false);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 }

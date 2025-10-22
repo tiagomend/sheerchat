@@ -82,4 +82,19 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Email already exists"));
     }
+
+    @Test
+    void testRegisterUser_DatabaseCommunicationError() throws Exception {
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "password123");
+
+        when(userService.registerUser(any(RegisterRequest.class)))
+                .thenThrow(new RuntimeException("Erro ao comunicar com o banco de dados. Tente novamente mais tarde."));
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("Erro ao comunicar com o banco de dados. Tente novamente mais tarde."));
+    }
 }

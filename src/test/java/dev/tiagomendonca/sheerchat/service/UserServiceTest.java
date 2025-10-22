@@ -111,4 +111,24 @@ class UserServiceTest {
         assertEquals("Conta criada com sucesso", response.getMessage());
         assertFalse(response.isEmailConfirmationSent());
     }
+
+    @Test
+    void testRegisterUser_DatabaseCommunicationError() {
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "password123");
+
+        when(userRepository.existsByUsername("testuser")).thenReturn(false);
+        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("Database connection failed"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            userService.registerUser(request);
+        });
+
+        assertEquals("Erro ao comunicar com o banco de dados. Tente novamente mais tarde.", exception.getMessage());
+        verify(userRepository).existsByUsername("testuser");
+        verify(userRepository).existsByEmail("test@example.com");
+        verify(passwordEncoder).encode("password123");
+        verify(userRepository).save(any(User.class));
+    }
 }

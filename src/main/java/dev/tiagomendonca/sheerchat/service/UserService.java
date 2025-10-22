@@ -23,33 +23,39 @@ public class UserService {
     }
 
     public RegisterResponse registerUser(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+        try {
+            if (userRepository.existsByUsername(request.getUsername())) {
+                throw new IllegalArgumentException("Username already exists");
+            }
+
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new IllegalArgumentException("Email already exists");
+            }
+
+            User user = new User();
+            user.setUsername(request.getUsername());
+            user.setEmail(request.getEmail());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setEmailConfirmed(!emailConfirmationEnabled);
+
+            User savedUser = userRepository.save(user);
+
+            boolean emailSent = false;
+            if (emailConfirmationEnabled) {
+                emailSent = sendConfirmationEmail(savedUser);
+            }
+
+            return new RegisterResponse(
+                "Conta criada com sucesso",
+                savedUser.getId(),
+                savedUser.getUsername(),
+                emailSent
+            );
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao comunicar com o banco de dados. Tente novamente mais tarde.", e);
         }
-
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
-        }
-
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmailConfirmed(!emailConfirmationEnabled);
-
-        User savedUser = userRepository.save(user);
-
-        boolean emailSent = false;
-        if (emailConfirmationEnabled) {
-            emailSent = sendConfirmationEmail(savedUser);
-        }
-
-        return new RegisterResponse(
-            "Conta criada com sucesso",
-            savedUser.getId(),
-            savedUser.getUsername(),
-            emailSent
-        );
     }
 
     private boolean sendConfirmationEmail(User user) {
