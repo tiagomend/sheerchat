@@ -37,7 +37,7 @@ class AuthControllerTest {
 
     @Test
     void testRegisterUser_Success() throws Exception {
-        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "password123");
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "Password123!");
         RegisterResponse response = new RegisterResponse("Conta criada com sucesso", 1L, "testuser", false);
 
         when(userService.registerUser(any(RegisterRequest.class))).thenReturn(response);
@@ -55,7 +55,7 @@ class AuthControllerTest {
 
     @Test
     void testRegisterUser_UsernameAlreadyExists() throws Exception {
-        RegisterRequest request = new RegisterRequest("existinguser", "test@example.com", "password123");
+        RegisterRequest request = new RegisterRequest("existinguser", "test@example.com", "Password123!");
 
         when(userService.registerUser(any(RegisterRequest.class)))
                 .thenThrow(new IllegalArgumentException("Username already exists"));
@@ -70,7 +70,7 @@ class AuthControllerTest {
 
     @Test
     void testRegisterUser_EmailAlreadyExists() throws Exception {
-        RegisterRequest request = new RegisterRequest("newuser", "existing@example.com", "password123");
+        RegisterRequest request = new RegisterRequest("newuser", "existing@example.com", "Password123!");
 
         when(userService.registerUser(any(RegisterRequest.class)))
                 .thenThrow(new IllegalArgumentException("Email already exists"));
@@ -81,5 +81,71 @@ class AuthControllerTest {
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Email already exists"));
+    }
+
+    @Test
+    void testRegisterUser_InvalidPassword_MissingNumbers() throws Exception {
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "Password!");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterUser_InvalidPassword_MissingSymbols() throws Exception {
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "Password123");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterUser_InvalidPassword_MissingLetters() throws Exception {
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "12345678!");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterUser_InvalidPassword_TooShort() throws Exception {
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "Pass1!");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterUser_InvalidEmail() throws Exception {
+        RegisterRequest request = new RegisterRequest("testuser", "invalid-email", "Password123!");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testRegisterUser_EmptyFields() throws Exception {
+        RegisterRequest request = new RegisterRequest("", "", "");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+                .andExpect(status().isBadRequest());
     }
 }
