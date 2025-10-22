@@ -51,7 +51,7 @@ class RegistrationIntegrationTest {
 
     @Test
     void testCompleteRegistrationFlow() throws Exception {
-        RegisterRequest request = new RegisterRequest("integrationuser", "integration@example.com", "password123");
+        RegisterRequest request = new RegisterRequest("integrationuser", "integration@example.com", "Password123!");
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -67,13 +67,13 @@ class RegistrationIntegrationTest {
         assertTrue(savedUser.isPresent());
         assertEquals("integrationuser", savedUser.get().getUsername());
         assertEquals("integration@example.com", savedUser.get().getEmail());
-        assertTrue(passwordEncoder.matches("password123", savedUser.get().getPassword()));
+        assertTrue(passwordEncoder.matches("Password123!", savedUser.get().getPassword()));
         assertTrue(savedUser.get().isEmailConfirmed());
     }
 
     @Test
     void testDuplicateUsernameRegistration() throws Exception {
-        RegisterRequest request1 = new RegisterRequest("duplicateuser", "user1@example.com", "password123");
+        RegisterRequest request1 = new RegisterRequest("duplicateuser", "user1@example.com", "Password123!");
         
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +81,7 @@ class RegistrationIntegrationTest {
                 .with(csrf()))
                 .andExpect(status().isCreated());
 
-        RegisterRequest request2 = new RegisterRequest("duplicateuser", "user2@example.com", "password456");
+        RegisterRequest request2 = new RegisterRequest("duplicateuser", "user2@example.com", "Password456!");
         
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -93,7 +93,7 @@ class RegistrationIntegrationTest {
 
     @Test
     void testDuplicateEmailRegistration() throws Exception {
-        RegisterRequest request1 = new RegisterRequest("user1", "duplicate@example.com", "password123");
+        RegisterRequest request1 = new RegisterRequest("user1", "duplicate@example.com", "Password123!");
         
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -101,7 +101,7 @@ class RegistrationIntegrationTest {
                 .with(csrf()))
                 .andExpect(status().isCreated());
 
-        RegisterRequest request2 = new RegisterRequest("user2", "duplicate@example.com", "password456");
+        RegisterRequest request2 = new RegisterRequest("user2", "duplicate@example.com", "Password456!");
         
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)

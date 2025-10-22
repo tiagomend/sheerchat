@@ -37,13 +37,13 @@ class UserServiceTest {
 
     @Test
     void testRegisterUser_Success() {
-        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "password123");
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "Password123!");
         User savedUser = new User("testuser", "test@example.com", "encodedPassword");
         savedUser.setId(1L);
 
         when(userRepository.existsByUsername("testuser")).thenReturn(false);
         when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+        when(passwordEncoder.encode("Password123!")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         RegisterResponse response = userService.registerUser(request);
@@ -56,13 +56,13 @@ class UserServiceTest {
 
         verify(userRepository).existsByUsername("testuser");
         verify(userRepository).existsByEmail("test@example.com");
-        verify(passwordEncoder).encode("password123");
+        verify(passwordEncoder).encode("Password123!");
         verify(userRepository).save(any(User.class));
     }
 
     @Test
     void testRegisterUser_UsernameExists() {
-        RegisterRequest request = new RegisterRequest("existinguser", "test@example.com", "password123");
+        RegisterRequest request = new RegisterRequest("existinguser", "test@example.com", "Password123!");
 
         when(userRepository.existsByUsername("existinguser")).thenReturn(true);
 
@@ -77,7 +77,7 @@ class UserServiceTest {
 
     @Test
     void testRegisterUser_EmailExists() {
-        RegisterRequest request = new RegisterRequest("newuser", "existing@example.com", "password123");
+        RegisterRequest request = new RegisterRequest("newuser", "existing@example.com", "Password123!");
 
         when(userRepository.existsByUsername("newuser")).thenReturn(false);
         when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
@@ -96,13 +96,13 @@ class UserServiceTest {
     void testRegisterUser_WithEmailConfirmationEnabled() {
         ReflectionTestUtils.setField(userService, "emailConfirmationEnabled", true);
 
-        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "password123");
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "Password123!");
         User savedUser = new User("testuser", "test@example.com", "encodedPassword");
         savedUser.setId(1L);
 
         when(userRepository.existsByUsername("testuser")).thenReturn(false);
         when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+        when(passwordEncoder.encode("Password123!")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         RegisterResponse response = userService.registerUser(request);
