@@ -32,7 +32,7 @@ public class UserService {
             }
 
             if (userRepository.existsByEmail(request.getEmail())) {
-                throw new EmailAlreadyExistsException("Email already exists");
+                throw new EmailAlreadyExistsException("E-mail já cadastrado");
             }
 
             User user = new User();

@@ -76,14 +76,14 @@ class AuthControllerTest {
         RegisterRequest request = new RegisterRequest("newuser", "existing@example.com", "Password123!");
 
         when(userService.registerUser(any(RegisterRequest.class)))
-                .thenThrow(new EmailAlreadyExistsException("Email already exists"));
+                .thenThrow(new EmailAlreadyExistsException("E-mail já cadastrado"));
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Email already exists"));
+                .andExpect(jsonPath("$.message").value("E-mail já cadastrado"));
     }
 
     @Test

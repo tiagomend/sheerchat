@@ -108,6 +108,6 @@ class RegistrationIntegrationTest {
                 .content(objectMapper.writeValueAsString(request2))
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Email already exists"));
+                .andExpect(jsonPath("$.message").value("E-mail já cadastrado"));
     }
 }

@@ -42,7 +42,7 @@ Quando o nome de usuário já existe:
 Quando o e-mail já existe:
 ```json
 {
-  "message": "Email already exists",
+  "message": "E-mail já cadastrado",
   "userId": null,
   "username": null,
   "emailConfirmationSent": false
