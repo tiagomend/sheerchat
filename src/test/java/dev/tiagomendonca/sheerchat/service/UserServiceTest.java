@@ -2,6 +2,9 @@ package dev.tiagomendonca.sheerchat.service;
 
 import dev.tiagomendonca.sheerchat.dto.RegisterRequest;
 import dev.tiagomendonca.sheerchat.dto.RegisterResponse;
+import dev.tiagomendonca.sheerchat.exception.DatabaseCommunicationException;
+import dev.tiagomendonca.sheerchat.exception.EmailAlreadyExistsException;
+import dev.tiagomendonca.sheerchat.exception.UsernameAlreadyExistsException;
 import dev.tiagomendonca.sheerchat.model.User;
 import dev.tiagomendonca.sheerchat.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +69,7 @@ class UserServiceTest {
 
         when(userRepository.existsByUsername("existinguser")).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        UsernameAlreadyExistsException exception = assertThrows(UsernameAlreadyExistsException.class, () -> {
             userService.registerUser(request);
         });
 
@@ -82,7 +85,7 @@ class UserServiceTest {
         when(userRepository.existsByUsername("newuser")).thenReturn(false);
         when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        EmailAlreadyExistsException exception = assertThrows(EmailAlreadyExistsException.class, () -> {
             userService.registerUser(request);
         });
 
@@ -110,5 +113,25 @@ class UserServiceTest {
         assertNotNull(response);
         assertEquals("Conta criada com sucesso", response.getMessage());
         assertFalse(response.isEmailConfirmationSent());
+    }
+
+    @Test
+    void testRegisterUser_DatabaseCommunicationError() {
+        RegisterRequest request = new RegisterRequest("testuser", "test@example.com", "Password123!");
+
+        when(userRepository.existsByUsername("testuser")).thenReturn(false);
+        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("Password123!")).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenThrow(new RuntimeException("Database connection failed"));
+
+        DatabaseCommunicationException exception = assertThrows(DatabaseCommunicationException.class, () -> {
+            userService.registerUser(request);
+        });
+
+        assertEquals("Erro ao comunicar com o banco de dados. Tente novamente mais tarde.", exception.getMessage());
+        verify(userRepository).existsByUsername("testuser");
+        verify(userRepository).existsByEmail("test@example.com");
+        verify(passwordEncoder).encode("Password123!");
+        verify(userRepository).save(any(User.class));
     }
 }
