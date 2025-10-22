@@ -53,6 +53,9 @@ public class UserService {
     }
 
     private boolean sendConfirmationEmail(User user) {
+        // TODO: Implement email confirmation logic
+        // Email sending is not yet implemented. When emailConfirmationEnabled is true,
+        // this method should send a confirmation email to the user.
         return false;
     }
 }
