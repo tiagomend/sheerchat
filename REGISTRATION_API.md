@@ -57,7 +57,7 @@ curl -X POST http://localhost:8080/api/auth/register \
   -d '{
     "username": "novousuario",
     "email": "usuario@exemplo.com",
-    "password": "senhaSegura123"
+    "password": "SenhaSegura123!"
   }'
 ```
 
@@ -73,10 +73,28 @@ app.email.confirmation.enabled=true
 
 Quando habilitada, será necessário implementar o serviço de envio de e-mail.
 
+## Validações
+
+### Campos Obrigatórios
+- `username`: mínimo 3 caracteres, máximo 30 caracteres
+- `email`: formato válido com "@" e domínio válido
+- `password`: mínimo 8 caracteres, máximo 100 caracteres
+
+### Requisitos de Senha
+A senha deve conter:
+- Pelo menos uma letra (maiúscula ou minúscula)
+- Pelo menos um número
+- Pelo menos um símbolo (caractere especial)
+
+Exemplos de senhas válidas: `Password123!`, `Senha@456`, `Test#789`
+
 ## Funcionalidades
 
 - ✅ Validação de unicidade de nome de usuário
 - ✅ Validação de unicidade de e-mail
+- ✅ Validação de formato de e-mail
+- ✅ Validação de força de senha (letras, números e símbolos)
+- ✅ Validação de campos obrigatórios
 - ✅ Armazenamento seguro de senhas (hash BCrypt)
 - ✅ Mensagem de confirmação: "Conta criada com sucesso"
 - ✅ Suporte para confirmação de e-mail (opcional)
