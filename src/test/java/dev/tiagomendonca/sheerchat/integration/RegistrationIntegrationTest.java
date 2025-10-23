@@ -88,7 +88,8 @@ class RegistrationIntegrationTest {
                 .content(objectMapper.writeValueAsString(request2))
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Username already exists"));
+                .andExpect(jsonPath("$.message").value("Username already exists"))
+                .andExpect(jsonPath("$.errorCode").value("USERNAME_ALREADY_EXISTS"));
     }
 
     @Test
@@ -108,6 +109,7 @@ class RegistrationIntegrationTest {
                 .content(objectMapper.writeValueAsString(request2))
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Email already exists"));
+                .andExpect(jsonPath("$.message").value("Email already exists"))
+                .andExpect(jsonPath("$.errorCode").value("EMAIL_ALREADY_EXISTS"));
     }
 }

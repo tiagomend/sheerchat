@@ -68,7 +68,8 @@ class AuthControllerTest {
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Username already exists"));
+                .andExpect(jsonPath("$.message").value("Username already exists"))
+                .andExpect(jsonPath("$.errorCode").value("USERNAME_ALREADY_EXISTS"));
     }
 
     @Test
@@ -83,7 +84,8 @@ class AuthControllerTest {
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Email already exists"));
+                .andExpect(jsonPath("$.message").value("Email already exists"))
+                .andExpect(jsonPath("$.errorCode").value("EMAIL_ALREADY_EXISTS"));
     }
 
     @Test

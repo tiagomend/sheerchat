@@ -74,6 +74,7 @@ class UserServiceTest {
         });
 
         assertEquals("Username already exists", exception.getMessage());
+        assertEquals("USERNAME_ALREADY_EXISTS", exception.getErrorCode());
         verify(userRepository).existsByUsername("existinguser");
         verify(userRepository, never()).save(any(User.class));
     }
@@ -90,6 +91,7 @@ class UserServiceTest {
         });
 
         assertEquals("Email already exists", exception.getMessage());
+        assertEquals("EMAIL_ALREADY_EXISTS", exception.getErrorCode());
         verify(userRepository).existsByUsername("newuser");
         verify(userRepository).existsByEmail("existing@example.com");
         verify(userRepository, never()).save(any(User.class));
