@@ -1,13 +1,13 @@
 package dev.tiagomendonca.sheerchat.exception;
 
 public class UsernameAlreadyExistsException extends RuntimeException {
-    private static final String ERROR_CODE = "USERNAME_ALREADY_EXISTS";
+    private static final ErrorCode ERROR_CODE = ErrorCode.USERNAME_ALREADY_EXISTS;
     
     public UsernameAlreadyExistsException(String message) {
         super(message);
     }
     
-    public String getErrorCode() {
+    public ErrorCode getErrorCode() {
         return ERROR_CODE;
     }
 }
