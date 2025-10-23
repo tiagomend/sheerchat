@@ -5,6 +5,7 @@ public class RegisterResponse {
     private Long userId;
     private String username;
     private boolean emailConfirmationSent;
+    private String errorCode;
 
     public RegisterResponse() {
     }
@@ -14,6 +15,14 @@ public class RegisterResponse {
         this.userId = userId;
         this.username = username;
         this.emailConfirmationSent = emailConfirmationSent;
+    }
+
+    public RegisterResponse(String message, Long userId, String username, boolean emailConfirmationSent, String errorCode) {
+        this.message = message;
+        this.userId = userId;
+        this.username = username;
+        this.emailConfirmationSent = emailConfirmationSent;
+        this.errorCode = errorCode;
     }
 
     public String getMessage() {
@@ -46,5 +55,13 @@ public class RegisterResponse {
 
     public void setEmailConfirmationSent(boolean emailConfirmationSent) {
         this.emailConfirmationSent = emailConfirmationSent;
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(String errorCode) {
+        this.errorCode = errorCode;
     }
 }

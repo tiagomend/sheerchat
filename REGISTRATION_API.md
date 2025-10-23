@@ -35,17 +35,19 @@ Quando o nome de usuário já existe:
   "message": "Username already exists",
   "userId": null,
   "username": null,
-  "emailConfirmationSent": false
+  "emailConfirmationSent": false,
+  "errorCode": "USERNAME_ALREADY_EXISTS"
 }
 ```
 
 Quando o e-mail já existe:
 ```json
 {
-  "message": "E-mail já cadastrado",
+  "message": "Email already exists",
   "userId": null,
   "username": null,
-  "emailConfirmationSent": false
+  "emailConfirmationSent": false,
+  "errorCode": "EMAIL_ALREADY_EXISTS"
 }
 ```
 

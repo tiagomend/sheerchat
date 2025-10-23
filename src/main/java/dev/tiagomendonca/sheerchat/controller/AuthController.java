@@ -26,8 +26,11 @@ public class AuthController {
         try {
             RegisterResponse response = userService.registerUser(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException e) {
-            RegisterResponse errorResponse = new RegisterResponse(e.getMessage(), null, null, false);
+        } catch (UsernameAlreadyExistsException e) {
+            RegisterResponse errorResponse = new RegisterResponse(e.getMessage(), null, null, false, e.getErrorCode());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (EmailAlreadyExistsException e) {
+            RegisterResponse errorResponse = new RegisterResponse(e.getMessage(), null, null, false, e.getErrorCode());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         } catch (DatabaseCommunicationException e) {
             RegisterResponse errorResponse = new RegisterResponse(e.getMessage(), null, null, false);

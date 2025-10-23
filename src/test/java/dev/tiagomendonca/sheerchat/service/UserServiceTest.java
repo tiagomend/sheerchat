@@ -89,7 +89,7 @@ class UserServiceTest {
             userService.registerUser(request);
         });
 
-        assertEquals("E-mail já cadastrado", exception.getMessage());
+        assertEquals("Email already exists", exception.getMessage());
         verify(userRepository).existsByUsername("newuser");
         verify(userRepository).existsByEmail("existing@example.com");
         verify(userRepository, never()).save(any(User.class));
