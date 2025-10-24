@@ -4,6 +4,7 @@ import dev.tiagomendonca.sheerchat.dto.RegisterRequest;
 import dev.tiagomendonca.sheerchat.dto.RegisterResponse;
 import dev.tiagomendonca.sheerchat.exception.DatabaseCommunicationException;
 import dev.tiagomendonca.sheerchat.exception.EmailAlreadyExistsException;
+import dev.tiagomendonca.sheerchat.exception.ErrorCode;
 import dev.tiagomendonca.sheerchat.exception.UsernameAlreadyExistsException;
 import dev.tiagomendonca.sheerchat.model.User;
 import dev.tiagomendonca.sheerchat.repository.UserRepository;
@@ -74,6 +75,7 @@ class UserServiceTest {
         });
 
         assertEquals("Username already exists", exception.getMessage());
+        assertEquals(ErrorCode.USERNAME_ALREADY_EXISTS, exception.getErrorCode());
         verify(userRepository).existsByUsername("existinguser");
         verify(userRepository, never()).save(any(User.class));
     }
@@ -90,6 +92,7 @@ class UserServiceTest {
         });
 
         assertEquals("Email already exists", exception.getMessage());
+        assertEquals(ErrorCode.EMAIL_ALREADY_EXISTS, exception.getErrorCode());
         verify(userRepository).existsByUsername("newuser");
         verify(userRepository).existsByEmail("existing@example.com");
         verify(userRepository, never()).save(any(User.class));
